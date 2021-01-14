@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
 
-//@@ desc GET
-router.get('/', userController.register);
+//@@ desc GET create an user
+router.post('/', userController.createUser);
 
 module.exports = router;
