@@ -18,7 +18,7 @@ mongoose.connect(MONGO_URI,{
 app.use(express.json());
 
 //@@ desc routes
-app.use('/api/users',userRoutes);
+app.use('/api/users', userRoutes);
 
 // @@ desc global error handler
 app.use((error, req, res, next) => {
