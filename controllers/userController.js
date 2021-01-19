@@ -28,13 +28,32 @@ const getUserById = async (req, res, next) => {
       res.status(404).send();
     }    
   } catch (error) {
-    next(error)
+    next(error);
   } 
+}
 
+const updateUser = async (req, res, next) => {
+    try {
+       let updatedUser = await userModel.findByIdAndUpdate(
+          req.params.userId,
+          req.body,
+          {new: true}
+       )
+        if(updatedUser){
+          res.status(200).json(updatedUser); 
+        }else{
+          res.status(404).send();
+        }   
+    } catch (error) {
+      next(error);
+    }
+
+   
 }
 
 module.exports = { 
                     createUser,
                     getUsers,
-                    getUserById
+                    getUserById,
+                    updateUser
                  }

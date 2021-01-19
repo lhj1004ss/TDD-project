@@ -7,6 +7,7 @@ const allUsers = require('../all-users.json');
 userModel.create = jest.fn(); 
 userModel.find = jest.fn();
 userModel.findById = jest.fn();
+userModel.findByIdAndUpdate =jest.fn();
 
 // @@ desc make a mock data
 const newUser = {
@@ -14,7 +15,8 @@ const newUser = {
   "job":"developer",
   "age":31
 }
-const userId = "5fff8d1cc94936d14ba2f726"
+const userId = "5fff8d1cc94936d14ba2f726";
+const updatedUser = {name: "updated", job: "updated"};
 let req, res, next;
 
 beforeEach(() => {
@@ -114,5 +116,41 @@ describe('User Controller GetById', () => {
     userModel.findById.mockReturnValue(rejectedPromise);
     await userController.getUserById(req, res, next);
     expect(next).toBeCalledWith(errorMessage);
+  })
+})
+
+describe('User Controller Update', () => {
+  it('should have an updateUser function', () => {
+    expect(typeof userController.updateUser).toBe('function');
+  })
+  it('should call userModel.findByIdAndUpdate', async () => {
+    req.params.userId = userId;
+    req.body = updatedUser;
+    await userController.updateUser(req, res, next);
+    expect(userModel.findByIdAndUpdate).toHaveBeenCalledWith(      
+      userId, updatedUser, {new: true}
+    )
+  })
+  it('should return json body and statusCode 200 response', async () => {
+    req.params.userId = userId;
+    req.body = updatedUser;
+    userModel.findByIdAndUpdate.mockReturnValue(updatedUser);
+    await userController.updateUser(req, res, next);
+    expect(res.statusCode).toBe(200);
+    expect(res._getJSONData()).toStrictEqual(updatedUser);
+    expect(res._isEndCalled).toBeTruthy();
+  })
+  it('should handle 404 when user does not exist', async () => {
+    userModel.findByIdAndUpdate.mockReturnValue(null);
+    await userController.updateUser(req, res, next);
+    expect(res.statusCode).toBe(404);
+    expect(res._isEndCalled).toBeTruthy();
+  })
+  it('should handle errors', async () => {
+    const errorMessage = {message: "Error"};
+    const rejectedPromise = Promise.reject(errorMessage);
+    userModel.findByIdAndUpdate.mockReturnValue(rejectedPromise);
+    await userController.updateUser(req, res, next);
+    expect(next).toHaveBeenCalledWith(errorMessage);
   })
 })

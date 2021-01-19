@@ -37,15 +37,27 @@ it('GET /api/users', async () => {
   expect(response.body[0].job).toBeDefined();
   firstUser = response.body[0];
 })
-
+//@@ desc read(GET) only one user Intergration TDD
 it('GET /api/users/:userId', async () => {
   const response = await request(app).get('/api/users/' + firstUser._id);
   expect(response.statusCode).toBe(200);
   expect(response.body.name).toBe(firstUser.name);
   expect(response.body.job).toBe(firstUser.job);
 })
-
 it('GET userId does not exist /api/users/:userId', async () => {
   const response = await request(app).get('/api/users/5fff8d1cc94936d14ba2f700');
   expect(response.statusCode).toBe(404);
 })
+//
+it('PUT /api/users', async() => {
+  const response = await request(app).put('/api/users/'+ firstUser._id)
+                                     .send({name:"updated name",job:"updated job"});
+  expect(response.statusCode).toBe(200);
+  expect(response.body.name).toBe("updated name");
+  expect(response.body.job).toBe("updated job");
+})
+ it('should return 404 on PUT /api/users', async() =>{
+    const response = await request(app).put('/api/users/5fff8d1cc94936d14ba2f700')
+                                       .send({name:"updated name",job:"updated job"});
+    expect(response.statusCode).toBe(404);
+  })
