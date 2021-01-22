@@ -7,7 +7,8 @@ const allUsers = require('../all-users.json');
 userModel.create = jest.fn(); 
 userModel.find = jest.fn();
 userModel.findById = jest.fn();
-userModel.findByIdAndUpdate =jest.fn();
+userModel.findByIdAndUpdate = jest.fn();
+userModel.findByIdAndDelete = jest.fn();
 
 // @@ desc make a mock data
 const newUser = {
@@ -151,6 +152,42 @@ describe('User Controller Update', () => {
     const rejectedPromise = Promise.reject(errorMessage);
     userModel.findByIdAndUpdate.mockReturnValue(rejectedPromise);
     await userController.updateUser(req, res, next);
+    expect(next).toHaveBeenCalledWith(errorMessage);
+  })
+})
+
+describe('User Controller Delete', () => {
+  it('should have a deleteUser function',() => {
+    expect(typeof userController.deleteUser).toBe('function');
+  })
+  it('should call userModel findByIdAndDelete', async () => {
+    req.params.userId = userId;
+    await userController.deleteUser(req, res, next);
+    expect(userModel.findByIdAndDelete).toBeCalledWith(userId);
+  })
+  it('should return 200 response', async () => {
+    //@@ desc mock value for deleting
+    let deletedUser = {
+      name : "deleted User",
+      job : "deleted Job"
+    }
+    userModel.findByIdAndDelete.mockReturnValue(deletedUser);
+    await userController.deleteUser(req, res, next);
+    expect(res.statusCode).toBe(200);
+    expect(res._isEndCalled()).toBeTruthy();
+    expect(res._getJSONData()).toStrictEqual(deletedUser);
+  })
+  it('should handle 404 when user does not exist', async () => {
+    userModel.findByIdAndDelete.mockReturnValue(null);
+    await userController.deleteUser(req, res, next);
+    expect(res.statusCode).toBe(404);
+    expect(res._isEndCalled()).toBeTruthy();
+  })
+  it('should handle errors', async () => {
+    const errorMessage = {message: "Deleting Error"};
+    const rejectedPromise = Promise.reject(errorMessage);
+    userModel.findByIdAndDelete.mockReturnValue(rejectedPromise);
+    await userController.deleteUser(req, res, next);
     expect(next).toHaveBeenCalledWith(errorMessage);
   })
 })

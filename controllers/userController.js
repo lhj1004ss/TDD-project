@@ -47,13 +47,23 @@ const updateUser = async (req, res, next) => {
     } catch (error) {
       next(error);
     }
-
-   
 }
-
+const deleteUser = async (req, res, next) => {
+  try {
+    const deletedUser = await userModel.findByIdAndDelete(req.params.userId);
+    if(deletedUser){
+      res.status(200).json(deletedUser);
+    }else{
+      res.status(404).send();
+    }
+  } catch (error) {
+    next(error);
+  }
+}
 module.exports = { 
                     createUser,
                     getUsers,
                     getUserById,
-                    updateUser
+                    updateUser,
+                    deleteUser
                  }

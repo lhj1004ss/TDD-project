@@ -48,7 +48,7 @@ it('GET userId does not exist /api/users/:userId', async () => {
   const response = await request(app).get('/api/users/5fff8d1cc94936d14ba2f700');
   expect(response.statusCode).toBe(404);
 })
-//
+//@@ desc update User
 it('PUT /api/users', async() => {
   const response = await request(app).put('/api/users/'+ firstUser._id)
                                      .send({name:"updated name",job:"updated job"});
@@ -61,3 +61,14 @@ it('PUT /api/users', async() => {
                                        .send({name:"updated name",job:"updated job"});
     expect(response.statusCode).toBe(404);
   })
+
+  //@@ desc delete User
+it('DELETE /api/users', async () => {
+  const response = await request(app).delete('/api/users/' + firstUser._id)
+                                     .send();
+  expect(response.statusCode).toBe(200);
+})
+it('DELETE id does not exist /api/users/:userId', async () => {
+  const response = await request(app).delete('/api/users/5fff8d1cc94936d14ba2f700').send();
+  expect(response.statusCode).toBe(404);
+})
